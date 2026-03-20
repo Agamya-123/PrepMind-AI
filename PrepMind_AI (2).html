@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PrepMind AI — Exam Preparation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #06060a; --bg2: #0e0e16; --bg3: #16161f; --bg4: #1e1e2a;
+    --accent: #e8ff5a; --accent-dim: rgba(232,255,90,0.12); --accent-glow: rgba(232,255,90,0.25);
+    --text: #f0f0f8; --text2: #9090a8; --text3: #5a5a72;
+    --border: rgba(255,255,255,0.07); --border2: rgba(232,255,90,0.2);
+    --red: #ff5a6e; --green: #5aff9a; --r: 12px; --r2: 20px;
+    --font-display: 'Clash Display', sans-serif; --font-body: 'Instrument Sans', sans-serif;
+  }
+  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;line-height:1.6}
+  ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:var(--bg2)} ::-webkit-scrollbar-thumb{background:var(--accent-dim);border-radius:2px}
+  .hidden{display:none!important} .accent{color:var(--accent)}
+  body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:0.35}
+
+  /* LANDING */
+  #landing{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;position:relative;overflow:hidden}
+  #landing::after{content:'';position:absolute;width:700px;height:700px;background:radial-gradient(circle,rgba(232,255,90,0.05) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-60%);pointer-events:none}
+  .landing-badge{display:inline-flex;align-items:center;gap:8px;background:var(--accent-dim);border:1px solid var(--border2);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--accent);font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:32px;animation:fadeUp .6s ease both}
+  .landing-badge::before{content:'●';font-size:8px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .landing-title{font-family:var(--font-display);font-size:clamp(42px,8vw,88px);font-weight:700;line-height:.95;text-align:center;animation:fadeUp .6s .1s ease both;letter-spacing:-.02em;max-width:900px}
+  .landing-title .line2{color:var(--accent);display:block}
+  .landing-sub{color:var(--text2);font-size:17px;text-align:center;max-width:480px;margin-top:20px;animation:fadeUp .6s .2s ease both;font-style:italic}
+  .landing-form{width:100%;max-width:580px;margin-top:40px;animation:fadeUp .6s .3s ease both}
+
+  /* MODEL TABS */
+  .model-selector{display:flex;gap:10px;margin-bottom:14px}
+  .model-tab{flex:1;padding:12px 16px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .2s;text-align:center}
+  .model-tab:hover{border-color:var(--border2)}
+  .model-tab.active{border-color:var(--accent);background:var(--accent-dim)}
+  .model-tab-name{font-family:var(--font-display);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:8px}
+  .model-tab.active .model-tab-name{color:var(--accent)}
+  .model-tab-sub{font-size:11px;color:var(--text3);margin-top:3px}
+  .model-tab.active .model-tab-sub{color:var(--text2)}
+  .free-badge{background:rgba(90,255,154,.2);color:var(--green);border-radius:4px;padding:1px 6px;font-size:10px;font-weight:700}
+
+  /* API KEY */
+  .apikey-wrap{margin-bottom:12px;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
+  .apikey-wrap:focus-within{border-color:rgba(232,255,90,.35)}
+  .apikey-inner{display:flex;align-items:center}
+  .apikey-icon{padding:0 14px;font-size:16px;flex-shrink:0;border-right:1px solid var(--border);height:48px;display:flex;align-items:center}
+  #apiKeyInput{flex:1;background:transparent;border:none;outline:none;padding:14px 12px;color:var(--text);font-family:var(--font-body);font-size:14px}
+  #apiKeyInput::placeholder{color:var(--text3)}
+  .key-save-btn{background:var(--bg4);border:none;border-left:1px solid var(--border);color:var(--text2);font-size:12px;font-weight:700;padding:0 16px;height:48px;cursor:pointer;transition:all .2s;white-space:nowrap;font-family:var(--font-body)}
+  .key-save-btn:hover{background:var(--accent-dim);color:var(--accent)}
+  .key-saved{color:var(--green)!important}
+  .apikey-hint{padding:7px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .apikey-hint a{color:var(--accent);text-decoration:none}
+  .apikey-hint a:hover{text-decoration:underline}
+  .hint-link{background:var(--accent-dim);border:1px solid var(--border2);border-radius:6px;padding:2px 8px;font-size:11px;font-weight:600;color:var(--accent);text-decoration:none!important}
+
+  /* EXAM INPUT */
+  .input-wrap{position:relative;background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r2);overflow:hidden;transition:border-color .2s}
+  .input-wrap:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px var(--accent-glow)}
+  #examInput{width:100%;background:transparent;border:none;outline:none;padding:20px 160px 20px 24px;color:var(--text);font-family:var(--font-display);font-size:18px;font-weight:500}
+  #examInput::placeholder{color:var(--text3)}
+  .start-btn{position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--accent);color:var(--bg);border:none;border-radius:var(--r);padding:12px 24px;font-family:var(--font-display);font-size:15px;font-weight:700;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .start-btn:hover{background:#d4eb45;transform:translateY(-50%) scale(1.02)}
+  .exam-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:18px;justify-content:center;animation:fadeUp .6s .4s ease both}
+  .exam-chip{padding:8px 18px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .2s;font-weight:500}
+  .exam-chip:hover{background:var(--accent-dim);border-color:var(--border2);color:var(--accent);transform:translateY(-1px)}
+  .landing-features{display:flex;gap:28px;margin-top:52px;animation:fadeUp .6s .5s ease both;flex-wrap:wrap;justify-content:center}
+  .feat-item{display:flex;align-items:center;gap:10px;color:var(--text2);font-size:14px}
+  .feat-icon{width:32px;height:32px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+
+  /* LOADING */
+  #loading{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px;gap:36px}
+  .loading-title{font-family:var(--font-display);font-size:26px;font-weight:600;text-align:center}
+  .loading-steps{display:flex;flex-direction:column;gap:14px;width:100%;max-width:420px}
+  .loading-step{display:flex;align-items:center;gap:16px;padding:14px 20px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);transition:all .4s;opacity:.4}
+  .loading-step.active{opacity:1;border-color:var(--accent);background:var(--accent-dim)}
+  .loading-step.done{opacity:.7;border-color:var(--green)}
+  .step-icon{width:36px;height:36px;border-radius:50%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .loading-step.active .step-icon{background:var(--accent);animation:spin 1s linear infinite}
+  .loading-step.done .step-icon{background:var(--green);animation:none}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .step-label{font-size:15px;font-weight:500} .step-sub{font-size:12px;color:var(--text2)}
+  .loading-progress-bar{width:100%;max-width:420px;height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+  .loading-progress-fill{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .5s ease}
+
+  /* APP */
+  #app{min-height:100vh;display:flex;flex-direction:column}
+  .topbar{position:sticky;top:0;z-index:100;background:rgba(6,6,10,.9);backdrop-filter:blur(20px);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:62px}
+  .topbar-brand{font-family:var(--font-display);font-size:18px;font-weight:700;display:flex;align-items:center;gap:10px}
+  .brand-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+  .topbar-center{display:flex;align-items:center;gap:10px}
+  .topbar-exam{background:var(--accent-dim);border:1px solid var(--border2);border-radius:100px;padding:5px 16px;font-size:13px;font-weight:600;color:var(--accent);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .model-pill{border-radius:100px;padding:4px 10px;font-size:11px;font-weight:700;letter-spacing:.04em}
+  .model-pill.gemini{background:rgba(66,133,244,.15);color:#4285f4}
+  .model-pill.openai{background:rgba(16,163,127,.15);color:#10a37f}
+  .icon-btn{width:36px;height:36px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:16px;transition:all .2s}
+  .icon-btn:hover{background:var(--bg3);border-color:var(--border2)}
+  .tabs-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 24px;display:flex;gap:2px;overflow-x:auto}
+  .tabs-bar::-webkit-scrollbar{height:0}
+  .tab-btn{padding:16px 18px;background:none;border:none;color:var(--text3);font-family:var(--font-body);font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s;display:flex;align-items:center;gap:7px}
+  .tab-btn:hover{color:var(--text2)} .tab-btn.active{color:var(--accent);border-bottom-color:var(--accent)}
+  .tab-badge{background:var(--accent);color:var(--bg);border-radius:100px;padding:1px 7px;font-size:11px;font-weight:700}
+  .content{flex:1;padding:28px 24px;max-width:1100px;margin:0 auto;width:100%}
+
+  /* CARDS */
+  .card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:24px}
+  .card-title{font-family:var(--font-display);font-size:18px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+  .card-title-icon{width:32px;height:32px;background:var(--accent-dim);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+  @media(max-width:768px){.grid2{grid-template-columns:1fr}}
+
+  /* OVERVIEW */
+  .overview-hero{background:linear-gradient(135deg,var(--bg3) 0%,var(--bg2) 100%);border:1px solid var(--border);border-radius:var(--r2);padding:32px;margin-bottom:24px;position:relative;overflow:hidden}
+  .overview-hero::before{content:'';position:absolute;top:-40px;right:-40px;width:200px;height:200px;background:radial-gradient(circle,var(--accent-glow),transparent 70%);pointer-events:none}
+  .overview-exam-name{font-family:var(--font-display);font-size:clamp(28px,5vw,48px);font-weight:700;color:var(--accent);line-height:1}
+  .overview-tagline{color:var(--text2);margin-top:8px;font-size:15px}
+  .overview-stats{display:flex;gap:14px;margin-top:22px;flex-wrap:wrap}
+  .stat-pill{background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:7px 16px;font-size:13px;display:flex;align-items:center;gap:8px}
+  .stat-pill strong{color:var(--accent);font-family:var(--font-display)}
+  .overview-content{color:var(--text2);line-height:1.8;font-size:14px}
+  .overview-content h3{font-family:var(--font-display);color:var(--text);font-size:15px;margin:18px 0 8px;display:flex;align-items:center;gap:8px}
+  .overview-content h3::before{content:'';width:3px;height:16px;background:var(--accent);border-radius:2px}
+  .chips-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .topic-chip{padding:6px 14px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;font-size:12px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text2)}
+  .topic-chip:hover{background:var(--accent-dim);border-color:var(--border2);color:var(--accent)}
+
+  /* PRACTICE */
+  .practice-filters{display:flex;gap:12px;margin-bottom:24px;flex-wrap:wrap;align-items:flex-end}
+  .filter-group{display:flex;flex-direction:column;gap:6px}
+  .filter-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+  select{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 36px 10px 16px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;cursor:pointer;transition:border-color .2s;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%239090a8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;min-width:150px}
+  select:focus,select:hover{border-color:var(--accent)}
+  .gen-btn{background:var(--accent);color:var(--bg);border:none;border-radius:var(--r);padding:10px 24px;font-family:var(--font-display);font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:8px;align-self:flex-end;height:42px}
+  .gen-btn:hover{background:#d4eb45;transform:translateY(-1px)} .gen-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+  .question-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:20px;animation:fadeUp .3s ease both}
+  .q-header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:20px}
+  .q-badge{padding:4px 12px;border-radius:100px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+  .q-badge.easy{background:rgba(90,255,154,.15);color:var(--green)} .q-badge.medium{background:rgba(255,200,90,.15);color:#ffc85a} .q-badge.hard{background:rgba(255,90,110,.15);color:var(--red)}
+  .q-text{font-size:16px;font-weight:500;line-height:1.7;margin-bottom:24px;color:var(--text)}
+  .q-options{display:flex;flex-direction:column;gap:10px;margin-bottom:20px}
+  .q-option{padding:14px 20px;background:var(--bg3);border:1.5px solid var(--border);border-radius:var(--r);cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;font-size:15px}
+  .q-option:hover:not(.disabled){border-color:var(--accent);background:var(--accent-dim)}
+  .q-option.correct{border-color:var(--green);background:rgba(90,255,154,.08)} .q-option.wrong{border-color:var(--red);background:rgba(255,90,110,.08)} .q-option.disabled{cursor:not-allowed}
+  .opt-letter{width:28px;height:28px;border-radius:6px;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;font-family:var(--font-display);flex-shrink:0}
+  .q-option.correct .opt-letter{background:var(--green);color:var(--bg)} .q-option.wrong .opt-letter{background:var(--red);color:#fff}
+  .q-explanation{background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:20px;margin-top:16px;display:none}
+  .q-explanation.show{display:block;animation:fadeUp .3s ease}
+  .exp-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);margin-bottom:10px}
+  .exp-text{font-size:14px;color:var(--text2);line-height:1.7}
+  .trick-box{background:rgba(232,255,90,.05);border:1px solid var(--border2);border-radius:8px;padding:12px 16px;margin-top:12px}
+  .trick-label{font-size:11px;color:var(--accent);font-weight:700;margin-bottom:4px}
+
+  /* TEACH */
+  .teach-grid{display:flex;flex-direction:column;gap:10px}
+  .topic-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:border-color .2s}
+  .topic-card:hover{border-color:var(--border2)}
+  .topic-card-header{padding:18px 20px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;gap:16px}
+  .topic-card-name{font-weight:600;font-size:15px;transition:color .2s;flex:1}
+  .topic-card:hover .topic-card-name{color:var(--accent)}
+  .teach-btn{background:var(--accent-dim);border:1px solid var(--border2);color:var(--accent);border-radius:8px;padding:6px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+  .teach-btn:hover{background:var(--accent);color:var(--bg)} .teach-btn:disabled{opacity:.5;cursor:not-allowed}
+  .chevron{width:20px;height:20px;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:11px;transition:transform .3s}
+  .topic-card.open .chevron{transform:rotate(180deg)}
+  .topic-card-body{max-height:0;overflow:hidden;transition:max-height .4s ease;border-top:0 solid var(--border)}
+  .topic-card.open .topic-card-body{max-height:2000px;border-top-width:1px}
+  .topic-card-content{padding:20px;color:var(--text2);font-size:14px;line-height:1.8}
+  .topic-card-content h4{font-family:var(--font-display);color:var(--text);font-size:14px;margin:16px 0 6px;font-weight:600}
+  .topic-card-content h4:first-child{margin-top:0}
+
+  /* CHAT */
+  .chat-wrap{display:flex;flex-direction:column;height:calc(100vh - 200px);min-height:500px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden}
+  .chat-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+  .chat-ai-avatar{width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;color:var(--bg);font-weight:700;font-family:var(--font-display);flex-shrink:0}
+  .chat-ai-name{font-weight:600;font-size:15px} .chat-ai-status{font-size:12px;color:var(--green);display:flex;align-items:center;gap:4px}
+  .chat-ai-status::before{content:'●';font-size:8px}
+  .chat-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+  .msg{display:flex;gap:10px;max-width:88%;animation:fadeUp .2s ease}
+  .msg.user{flex-direction:row-reverse;align-self:flex-end}
+  .msg-avatar{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;background:var(--bg3)}
+  .msg.ai .msg-avatar{background:var(--accent);color:var(--bg);font-weight:700;font-family:var(--font-display)}
+  .msg-bubble{padding:12px 16px;border-radius:16px;font-size:14px;line-height:1.7}
+  .msg.ai .msg-bubble{background:var(--bg3);border:1px solid var(--border);border-bottom-left-radius:4px;color:var(--text)}
+  .msg.user .msg-bubble{background:var(--accent);color:var(--bg);border-bottom-right-radius:4px;font-weight:500}
+  .msg-bubble strong{color:var(--accent)} .msg.user .msg-bubble strong{color:var(--bg)}
+  .typing-indicator{display:flex;gap:4px;align-items:center;padding:4px 0}
+  .typing-dot{width:6px;height:6px;background:var(--text3);border-radius:50%;animation:bounce 1.2s infinite}
+  .typing-dot:nth-child(2){animation-delay:.2s} .typing-dot:nth-child(3){animation-delay:.4s}
+  @keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+  .chat-suggestions{padding:0 20px 10px;display:flex;gap:8px;flex-wrap:wrap}
+  .suggest-chip{padding:6px 12px;background:var(--bg3);border:1px solid var(--border);border-radius:100px;font-size:12px;cursor:pointer;color:var(--text2);transition:all .2s}
+  .suggest-chip:hover{border-color:var(--border2);color:var(--accent)}
+  .chat-input-bar{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:10px;align-items:flex-end}
+  .chat-input{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:12px 16px;color:var(--text);font-family:var(--font-body);font-size:14px;outline:none;resize:none;min-height:44px;max-height:120px;transition:border-color .2s;line-height:1.5}
+  .chat-input:focus{border-color:var(--accent)} .chat-input::placeholder{color:var(--text3)}
+  .send-btn{width:44px;height:44px;background:var(--accent);border:none;border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;color:var(--bg);transition:all .2s;flex-shrink:0}
+  .send-btn:hover{background:#d4eb45;transform:scale(1.05)} .send-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+
+  /* PROGRESS */
+  .progress-overview{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+  @media(max-width:768px){.progress-overview{grid-template-columns:1fr 1fr}}
+  .prog-stat{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r2);padding:20px;text-align:center}
+  .prog-stat-num{font-family:var(--font-display);font-size:36px;font-weight:700;line-height:1;color:var(--accent)}
+  .prog-stat-label{font-size:12px;color:var(--text2);margin-top:6px;text-transform:uppercase;letter-spacing:.08em}
+  .prog-bar-wrap{background:var(--bg3);border-radius:100px;height:6px;overflow:hidden;margin-top:8px}
+  .prog-bar-fill{height:100%;background:var(--accent);border-radius:100px;transition:width .8s ease}
+  .prog-bar-fill.green{background:var(--green)} .prog-bar-fill.red{background:var(--red)}
+  .topic-row{display:flex;align-items:center;padding:13px 0;border-bottom:1px solid var(--border);gap:14px}
+  .topic-row:last-child{border-bottom:none}
+  .topic-row-name{flex:1;font-size:14px;font-weight:500} .topic-row-stats{font-size:12px;color:var(--text2);text-align:right;min-width:80px} .topic-row-bar{width:100px}
+  .ai-loader{display:flex;flex-direction:column;align-items:center;gap:14px;padding:48px;color:var(--text2);font-size:14px}
+  .ai-spinner{width:36px;height:36px;border:3px solid var(--bg3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}
+
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .fade-in{animation:fadeIn .4s ease both}
+
+  @media(max-width:600px){
+    .topbar{padding:0 16px} .content{padding:20px 16px} .tabs-bar{padding:0 12px}
+    .tab-btn{padding:13px 12px;font-size:13px} .question-card,.card{padding:18px}
+    .practice-filters{gap:8px} .model-selector{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<!-- LANDING -->
+<div id="landing">
+  <span class="landing-badge">✦ AI-Powered Exam Prep</span>
+  <h1 class="landing-title">Crack Any Exam<br><span class="line2">With PrepMind AI</span></h1>
+  <p class="landing-sub">Personalized prep for every competitive exam — PYQs, strategies, practice & more.</p>
+
+  <div class="landing-form">
+    <div class="model-selector">
+      <div class="model-tab active" id="tab-gemini" onclick="selectModel('gemini')">
+        <div class="model-tab-name">🔵 Gemini <span class="free-badge">FREE</span></div>
+        <div class="model-tab-sub">Google AI Studio · gemini-2.5-flash</div>
+      </div>
+      <div class="model-tab" id="tab-openai" onclick="selectModel('openai')">
+        <div class="model-tab-name">🟢 ChatGPT</div>
+        <div class="model-tab-sub">OpenAI API · gpt-4o-mini</div>
+      </div>
+    </div>
+
+    <div class="apikey-wrap">
+      <div class="apikey-inner">
+        <span class="apikey-icon" id="keyIcon">🔵</span>
+        <input type="password" id="apiKeyInput" placeholder="Paste your Google AI Studio key (AIza…)" autocomplete="off" oninput="onKeyInput()" onkeydown="if(event.key==='Enter')saveKey()">
+        <button class="key-save-btn" id="keySaveBtn" onclick="saveKey()">Save</button>
+      </div>
+      <div class="apikey-hint">
+        <span id="keyHintLabel">Get FREE Gemini key →</span>
+        <a class="hint-link" id="keyHintLink" href="https://aistudio.google.com/apikey" target="_blank">aistudio.google.com/apikey</a>
+        <span>· saved in your browser</span>
+      </div>
+    </div>
+
+    <div class="input-wrap">
+      <input type="text" id="examInput" placeholder="Type your exam… GATE, CAT, SBI PO, TCS NQT…" autocomplete="off" onkeydown="if(event.key==='Enter')startPrep()">
+      <button class="start-btn" onclick="startPrep()">Start Prep →</button>
+    </div>
+    <div class="exam-chips">
+      <div class="exam-chip" onclick="setExam('TCS NQT')">TCS NQT</div>
+      <div class="exam-chip" onclick="setExam('CAT MBA')">CAT MBA</div>
+      <div class="exam-chip" onclick="setExam('GATE CSE')">GATE CSE</div>
+      <div class="exam-chip" onclick="setExam('SBI PO')">SBI PO</div>
+      <div class="exam-chip" onclick="setExam('UPSC Civil Services')">UPSC</div>
+      <div class="exam-chip" onclick="setExam('JEE Advanced')">JEE Advanced</div>
+      <div class="exam-chip" onclick="setExam('NEET UG')">NEET</div>
+      <div class="exam-chip" onclick="setExam('SSC CGL')">SSC CGL</div>
+    </div>
+  </div>
+
+  <div class="landing-features">
+    <div class="feat-item"><div class="feat-icon">🎯</div> PYQ Pattern Analysis</div>
+    <div class="feat-item"><div class="feat-icon">⚡</div> AI Question Generator</div>
+    <div class="feat-item"><div class="feat-icon">📚</div> Topic-wise Teaching</div>
+    <div class="feat-item"><div class="feat-icon">💬</div> Doubt Solver Chat</div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="loading" class="hidden">
+  <div class="loading-title">Preparing your <span class="accent" id="loadingExamName"></span> dashboard</div>
+  <div class="loading-steps">
+    <div class="loading-step" id="ls1"><div class="step-icon">⚙</div><div><div class="step-label">Analyzing Exam Pattern</div><div class="step-sub">Fetching syllabus & structure</div></div></div>
+    <div class="loading-step" id="ls2"><div class="step-icon">📊</div><div><div class="step-label">Loading PYQ Trends</div><div class="step-sub">Topic-wise question frequency</div></div></div>
+    <div class="loading-step" id="ls3"><div class="step-icon">🧠</div><div><div class="step-label">Calibrating AI Tutor</div><div class="step-sub">Personalizing content for you</div></div></div>
+    <div class="loading-step" id="ls4"><div class="step-icon">✅</div><div><div class="step-label">Unlocking Dashboard</div><div class="step-sub">Almost ready!</div></div></div>
+  </div>
+  <div class="loading-progress-bar"><div class="loading-progress-fill" id="loadingBar"></div></div>
+</div>
+
+<!-- APP -->
+<div id="app" class="hidden">
+  <div class="topbar">
+    <div class="topbar-brand"><div class="brand-dot"></div>PrepMind AI</div>
+    <div class="topbar-center">
+      <div class="topbar-exam" id="topbarExamName"></div>
+      <div class="model-pill" id="topbarModelPill"></div>
+    </div>
+    <div class="icon-btn" onclick="goBack()" title="Change Exam / Key">🔄</div>
+  </div>
+  <div class="tabs-bar">
+    <button class="tab-btn active" onclick="switchTab('overview',this)">📋 Overview</button>
+    <button class="tab-btn" onclick="switchTab('practice',this)">⚡ Practice</button>
+    <button class="tab-btn" onclick="switchTab('teach',this)">📚 Teach Me</button>
+    <button class="tab-btn" onclick="switchTab('chat',this)">💬 Ask Doubt</button>
+    <button class="tab-btn" onclick="switchTab('progress',this)">📈 Progress <span class="tab-badge" id="progressBadge">0</span></button>
+  </div>
+
+  <div class="content fade-in" id="tab-overview"><div id="overviewContent"><div class="ai-loader"><div class="ai-spinner"></div><span>Generating overview…</span></div></div></div>
+  <div class="content fade-in hidden" id="tab-practice">
+    <div class="practice-filters">
+      <div class="filter-group"><label class="filter-label">Topic</label><select id="practiceTopicFilter"><option value="">All Topics</option></select></div>
+      <div class="filter-group"><label class="filter-label">Difficulty</label><select id="practiceDiffFilter"><option value="Mixed">Mixed</option><option value="Easy">Easy</option><option value="Medium">Medium</option><option value="Hard">Hard</option></select></div>
+      <div class="filter-group"><label class="filter-label">Count</label><select id="practiceCountFilter"><option value="3">3 Questions</option><option value="5" selected>5 Questions</option><option value="10">10 Questions</option></select></div>
+      <button class="gen-btn" id="genBtn" onclick="generateQuestions()"><span id="genBtnIcon">⚡</span> Generate Questions</button>
+    </div>
+    <div id="questionsContainer"></div>
+  </div>
+  <div class="content fade-in hidden" id="tab-teach">
+    <div class="card" style="margin-bottom:18px"><div class="card-title"><div class="card-title-icon">📚</div> Syllabus Topics</div><p style="color:var(--text2);font-size:14px">Click <strong style="color:var(--accent)">Teach Me</strong> on any topic for AI explanations, formulas, shortcuts & examples.</p></div>
+    <div class="teach-grid" id="teachGrid"><div class="ai-loader"><div class="ai-spinner"></div><span>Loading topics…</span></div></div>
+  </div>
+  <div class="content fade-in hidden" id="tab-chat">
+    <div class="chat-wrap">
+      <div class="chat-header"><div class="chat-ai-avatar">A</div><div><div class="chat-ai-name">PrepMind AI Tutor</div><div class="chat-ai-status">Online — knows your exam inside out</div></div></div>
+      <div class="chat-messages" id="chatMessages"></div>
+      <div class="chat-suggestions" id="chatSuggestions"></div>
+      <div class="chat-input-bar">
+        <textarea class="chat-input" id="chatInput" placeholder="Ask any doubt about your exam…" rows="1" onkeydown="chatKeyDown(event)"></textarea>
+        <button class="send-btn" id="sendBtn" onclick="sendChat()">➤</button>
+      </div>
+    </div>
+  </div>
+  <div class="content fade-in hidden" id="tab-progress">
+    <div class="progress-overview" id="progressStats"></div>
+    <div class="grid2">
+      <div class="card"><div class="card-title"><div class="card-title-icon">🎯</div> Topic-wise Accuracy</div><div id="topicAccuracy"><p style="color:var(--text2);font-size:14px;text-align:center;padding:20px 0">Practice questions to see stats</p></div></div>
+      <div class="card"><div class="card-title"><div class="card-title-icon">📊</div> Session Summary</div><div id="sessionSummary"><p style="color:var(--text2);font-size:14px;text-align:center;padding:20px 0">No sessions yet. Start practicing!</p></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── STATE ──
+const GEMINI_MODELS = [
+  { id: 'gemini-2.5-flash', label: 'Gemini 2.5 Flash' },
+  { id: 'gemini-2.5-flash-lite', label: 'Gemini 2.5 Flash Lite' },
+  { id: 'gemini-2.0-flash', label: 'Gemini 2.0 Flash' }
+];
+let activeModel = 'gemini';
+let currentGeminiModel = GEMINI_MODELS[0];
+let state = { exam:'', topics:[], chatHistory:[], progress:{total:0,correct:0,topics:{},sessions:[]}, overviewData:null };
+
+// ── MODEL SELECTOR ──
+function selectModel(model) {
+  try {
+    activeModel = model;
+    const tabGemini = document.getElementById('tab-gemini');
+    const tabOpenai = document.getElementById('tab-openai');
+    if (tabGemini) tabGemini.classList.toggle('active', model==='gemini');
+    if (tabOpenai) tabOpenai.classList.toggle('active', model==='openai');
+    
+    const inp = document.getElementById('apiKeyInput');
+    const hint = document.getElementById('keyHintLabel');
+    const link = document.getElementById('keyHintLink');
+    const icon = document.getElementById('keyIcon');
+    if (model === 'gemini') currentGeminiModel = getSavedGeminiModel();
+    
+    if (model === 'gemini') {
+      if (inp) inp.placeholder = 'Paste your Google AI Studio key (AIza…)';
+      if (hint) hint.textContent = 'Get FREE Gemini key →';
+      if (link) { link.textContent = 'aistudio.google.com/apikey'; link.href = 'https://aistudio.google.com/apikey'; }
+      if (icon) icon.textContent = '🔵';
+    } else {
+      if (inp) inp.placeholder = 'Paste your OpenAI API key (sk-…)';
+      if (hint) hint.textContent = 'Get OpenAI key →';
+      if (link) { link.textContent = 'platform.openai.com/api-keys'; link.href = 'https://platform.openai.com/api-keys'; }
+      if (icon) icon.textContent = '🟢';
+    }
+    
+    const saved = localStorage.getItem('prepmind_key_' + model) || '';
+    if (inp) inp.value = saved;
+    const btn = document.getElementById('keySaveBtn');
+    if (btn) {
+      if (saved) { btn.textContent = '✓ Saved'; btn.classList.add('key-saved'); }
+      else { btn.textContent = 'Save'; btn.classList.remove('key-saved'); }
+    }
+    updateTopbarModelPill();
+  } catch(e) {
+    console.error('Error in selectModel:', e);
+  }
+}
+
+function getSavedGeminiModel() {
+  const savedId = localStorage.getItem('prepmind_gemini_model');
+  return GEMINI_MODELS.find(model => model.id === savedId) || GEMINI_MODELS[0];
+}
+
+function saveGeminiModel(model) {
+  currentGeminiModel = model;
+  localStorage.setItem('prepmind_gemini_model', model.id);
+  updateTopbarModelPill();
+}
+
+function updateTopbarModelPill() {
+  const pill = document.getElementById('topbarModelPill');
+  if (!pill) return;
+  if (activeModel === 'gemini') {
+    pill.textContent = `🔵 ${currentGeminiModel.label}`;
+    pill.className = 'model-pill gemini';
+    return;
+  }
+  pill.textContent = '🟢 GPT-4o-mini';
+  pill.className = 'model-pill openai';
+}
+
+function saveKey() {
+  try {
+    const val = document.getElementById('apiKeyInput').value.trim();
+    if (!val) {
+      alert('Please enter an API key first');
+      return;
+    }
+    localStorage.setItem('prepmind_key_' + activeModel, val);
+    const btn = document.getElementById('keySaveBtn');
+    btn.textContent = '✓ Saved'; 
+    btn.classList.add('key-saved');
+    setTimeout(() => { 
+      btn.textContent = 'Save'; 
+      btn.classList.remove('key-saved'); 
+    }, 2500);
+  } catch(e) {
+    alert('Error saving key: ' + e.message);
+  }
+}
+
+function onKeyInput() {
+  try {
+    const btn = document.getElementById('keySaveBtn');
+    if (btn) {
+      btn.textContent = 'Save'; 
+      btn.classList.remove('key-saved');
+    }
+  } catch(e) {
+    console.error('Error in onKeyInput:', e);
+  }
+}
+
+function getApiKey() {
+  return document.getElementById('apiKeyInput').value.trim()
+    || localStorage.getItem('prepmind_key_' + activeModel) || '';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  // Initialize UI for Gemini (default)
+  selectModel('gemini');
+  
+  // Load saved API key
+  const saved = localStorage.getItem('prepmind_key_gemini') || '';
+  if (saved) {
+    document.getElementById('apiKeyInput').value = saved;
+    const btn = document.getElementById('keySaveBtn');
+    btn.textContent = '✓ Saved'; 
+    btn.classList.add('key-saved');
+  }
+});
+
+// Add event delegation for dynamic content
+document.addEventListener('click', (e) => {
+  if (e.target.classList.contains('exam-chip')) {
+    const examName = e.target.textContent.trim();
+    setExam(examName);
+  }
+});
+
+// ── AI CALL ──
+async function callAI(messages, systemPrompt, options = {}) {
+  const apiKey = getApiKey();
+  if (!apiKey) throw new Error('NO_KEY');
+  const sys = systemPrompt || `You are a world-class exam preparation tutor specializing in ${state.exam}. Be concise, accurate, and exam-focused.`;
+  return activeModel === 'gemini' ? callGemini(apiKey, messages, sys, options) : callOpenAI(apiKey, messages, sys, options);
+}
+
+async function callGemini(apiKey, messages, systemPrompt, options = {}) {
+  const modelChain = getGeminiModelChain(options.preferredGeminiModels);
+  let lastError = null;
+
+  for (const model of modelChain) {
+    try {
+      const text = await callGeminiModel(apiKey, model, messages, systemPrompt, options);
+      saveGeminiModel(model);
+      return text;
+    } catch (error) {
+      lastError = error;
+      if (!shouldTryNextGeminiModel(error)) throw error;
+    }
+  }
+
+  throw lastError || new Error('Gemini request failed');
+}
+
+function getGeminiModelChain(preferredGeminiModels) {
+  const pool = Array.isArray(preferredGeminiModels) && preferredGeminiModels.length
+    ? GEMINI_MODELS.filter(model => preferredGeminiModels.includes(model.id))
+    : GEMINI_MODELS.slice();
+
+  const currentIndex = pool.findIndex(model => model.id === currentGeminiModel.id);
+  if (currentIndex <= 0) return pool;
+  return [...pool.slice(currentIndex), ...pool.slice(0, currentIndex)];
+}
+
+async function callGeminiModel(apiKey, model, messages, systemPrompt, options = {}) {
+  const contents = messages.map(m => ({
+    role: m.role === 'assistant' ? 'model' : 'user',
+    parts: [{ text: m.content }]
+  }));
+  const body = {
+    system_instruction: { parts: [{ text: systemPrompt }] },
+    contents,
+    generationConfig: {
+      maxOutputTokens: options.maxOutputTokens || 1500,
+      temperature: options.temperature ?? 0.7
+    }
+  };
+  if (options.responseMimeType) body.generationConfig.responseMimeType = options.responseMimeType;
+  if (options.responseSchema) body.generationConfig.responseSchema = options.responseSchema;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model.id}:generateContent?key=${apiKey}`;
+  const res = await fetch(url, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const errMessage = err?.error?.message || 'Gemini API Error ' + res.status;
+    if (isGeminiQuotaMessage(errMessage)) {
+      throw new Error(`${errMessage} Tried model: ${model.label}.`);
+    }
+    throw new Error(errMessage);
+  }
+  const data = await res.json();
+  window.__lastGeminiResponse = data;
+  window.__lastGeminiModel = model.id;
+  const parts = data?.candidates?.[0]?.content?.parts || [];
+  const text = parts.map(part => part?.text || '').join('').trim();
+  if (!text) throw new Error(`Empty response from ${model.label}. Check your API key.`);
+  return text;
+}
+
+function isGeminiQuotaError(error) {
+  return isGeminiQuotaMessage(String(error?.message || error || ''));
+}
+
+function shouldTryNextGeminiModel(error) {
+  const message = String(error?.message || error || '');
+  return isGeminiQuotaMessage(message) || isGeminiModelUnavailableMessage(message);
+}
+
+function isGeminiQuotaMessage(message) {
+  const msg = String(message || '').toLowerCase();
+  return msg.includes('quota exceeded')
+    || msg.includes('rate limit')
+    || msg.includes('resource_exhausted')
+    || msg.includes('please retry in')
+    || msg.includes('429');
+}
+
+function isGeminiModelUnavailableMessage(message) {
+  const msg = String(message || '').toLowerCase();
+  return msg.includes('not found')
+    || msg.includes('not supported')
+    || msg.includes('unsupported')
+    || msg.includes('404');
+}
+
+async function callOpenAI(apiKey, messages, systemPrompt) {
+  const body = {
+    model: 'gpt-4o-mini',
+    max_tokens: 1500,
+    messages: [{ role:'system', content:systemPrompt }, ...messages]
+  };
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+    method:'POST',
+    headers:{ 'Content-Type':'application/json', 'Authorization':'Bearer ' + apiKey },
+    body: JSON.stringify(body)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err?.error?.message || 'OpenAI API Error ' + res.status);
+  }
+  const data = await res.json();
+  const text = data?.choices?.[0]?.message?.content;
+  if (!text) throw new Error('Empty response from OpenAI.');
+  return text;
+}
+
+// ── NAVIGATION ──
+function setExam(name) { 
+  const examInput = document.getElementById('examInput');
+  if (examInput) {
+    examInput.value = name;
+  }
+}
+
+function goBack() {
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('landing').classList.remove('hidden');
+  state = { exam:'', topics:[], chatHistory:[], progress:{total:0,correct:0,topics:{},sessions:[]}, overviewData:null };
+  selectModel(activeModel);
+}
+
+async function startPrep() {
+  try {
+    const apiKey = getApiKey();
+    if (!apiKey) {
+      const inp = document.getElementById('apiKeyInput');
+      if (inp) {
+        inp.focus(); 
+        inp.style.outline = '2px solid var(--red)';
+        setTimeout(() => inp.style.outline = '', 2500);
+      }
+      if (activeModel === 'gemini') {
+        alert('⚠️ Enter your FREE Gemini API key first!\n\nGet it free at:\nhttps://aistudio.google.com/apikey\n\n(No credit card needed!)');
+      } else {
+        alert('⚠️ Enter your OpenAI API key first!\n\nGet it at:\nhttps://platform.openai.com/api-keys');
+      }
+      return;
+    }
+    const exam = document.getElementById('examInput').value.trim();
+    if (!exam) { 
+      document.getElementById('examInput').focus(); 
+      alert('Please enter an exam name');
+      return; 
+    }
+    saveKey();
+    state.exam = exam;
+    document.getElementById('landing').classList.add('hidden');
+    document.getElementById('loading').classList.remove('hidden');
+    document.getElementById('loadingExamName').textContent = exam;
+    document.getElementById('topbarExamName').textContent = exam;
+    const pill = document.getElementById('topbarModelPill');
+    if (activeModel === 'gemini') { pill.textContent = '🔵 Gemini Free'; pill.className = 'model-pill gemini'; }
+    else { pill.textContent = '🟢 GPT-4o-mini'; pill.className = 'model-pill openai'; }
+    updateTopbarModelPill();
+    await runLoadingSequence();
+    document.getElementById('loading').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    loadOverview(); initChat();
+  } catch(e) {
+    alert('Error: ' + e.message);
+  }
+}
+
+async function runLoadingSequence() {
+  const steps = ['ls1','ls2','ls3','ls4'];
+  const bar = document.getElementById('loadingBar');
+  for (let i = 0; i < steps.length; i++) {
+    const s = document.getElementById(steps[i]);
+    s.classList.add('active'); s.querySelector('.step-icon').textContent = '↻';
+    bar.style.width = ((i+1)*25) + '%';
+    await sleep(600 + Math.random()*400);
+    s.classList.remove('active'); s.classList.add('done'); s.querySelector('.step-icon').textContent = '✓';
+  }
+  await sleep(250);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.content').forEach(c => c.classList.add('hidden'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.remove('hidden');
+  btn.classList.add('active');
+  if (tab === 'progress') renderProgress();
+}
+
+// ── OVERVIEW ──
+async function loadOverview() {
+  try {
+    const prompt = `For the "${state.exam}" exam, provide overview data as JSON. Return ONLY these fields:
+
+{"tagline":"your gateway phrase","pattern":"2-3 sentence pattern","duration":"duration","questions":"count","marks":"marks","difficulty":"level","topics":["t1","t2","t3","t4","t5"],"strategy":"strategy","studyPlan":"4 week plan","pyqInsight":"insights"}`;
+    const raw = await callAI([{role:'user',content:prompt}],
+      `You are an exam expert. Return ONLY valid JSON object starting with { and ending with }. No text before or after.`);
+    let data = null;
+    try {
+      let clean = raw.trim();
+      clean = clean.replace(/```json/gi, '').replace(/```/g, '');
+      clean = clean.replace(/^.*?\{/, '{');  // Start from first {
+      clean = clean.replace(/\}\s*.*$/, '}');  // End at last }
+      const start = clean.indexOf('{');
+      const end = clean.lastIndexOf('}');
+      if (start !== -1 && end !== -1 && start < end) {
+        const jsonStr = clean.substring(start, end + 1);
+        data = JSON.parse(jsonStr);
+      }
+    } catch(err) {
+      console.error('JSON parse error:', err);
+      data = null;
+    }
+    state.overviewData = data;
+    if (data?.topics?.length) { state.topics = data.topics; populateTopicFilter(); populateTeachGrid(); }
+    renderOverview(data, raw);
+  } catch(e) {
+    const isNoKey = e.message === 'NO_KEY';
+    document.getElementById('overviewContent').innerHTML = `
+      <div class="card">
+        <p style="color:var(--red);font-size:15px;margin-bottom:12px">❌ ${isNoKey ? 'No API key found.' : e.message}</p>
+        <p style="color:var(--text2);font-size:13px;line-height:1.8">
+          ${activeModel==='gemini'
+            ? '✅ <strong style="color:var(--accent)">Gemini is completely FREE!</strong><br>Get your key at <a href="https://aistudio.google.com/apikey" target="_blank" style="color:var(--accent)">aistudio.google.com/apikey</a> — no credit card needed.'
+            : 'Get your OpenAI key at <a href="https://platform.openai.com/api-keys" target="_blank" style="color:var(--accent)">platform.openai.com/api-keys</a>'}
+        </p>
+        <button onclick="goBack()" style="margin-top:18px;background:var(--accent);color:var(--bg);border:none;border-radius:var(--r);padding:10px 22px;font-weight:700;cursor:pointer;font-family:var(--font-display);font-size:14px">← Go Back & Enter Key</button>
+      </div>`;
+  }
+}
+
+function renderOverview(data, raw) {
+  if (!data) { 
+    // Show formatted raw response instead of raw JSON
+    const formatted = formatText(raw);
+    document.getElementById('overviewContent').innerHTML = `<div class="card overview-content">${formatted}</div>`; 
+    return; 
+  }
+  const chips = (data.topics||[]).map(t => `<span class="topic-chip" onclick="quickTeach('${t.replace(/'/g,"\\'")}')">${t}</span>`).join('');
+  document.getElementById('overviewContent').innerHTML = `
+    <div class="overview-hero">
+      <div class="overview-exam-name">${state.exam}</div>
+      <div class="overview-tagline">${data.tagline||''}</div>
+      <div class="overview-stats">
+        ${data.duration?`<div class="stat-pill">⏱ <strong>${data.duration}</strong> Duration</div>`:''}
+        ${data.questions?`<div class="stat-pill">📝 <strong>${data.questions}</strong> Questions</div>`:''}
+        ${data.marks?`<div class="stat-pill">🎯 <strong>${data.marks}</strong> Marks</div>`:''}
+        ${data.difficulty?`<div class="stat-pill">📊 <strong>${data.difficulty}</strong> Difficulty</div>`:''}
+      </div>
+    </div>
+    <div class="grid2" style="margin-bottom:20px">
+      <div class="card"><div class="card-title"><div class="card-title-icon">📋</div> Exam Pattern</div><div class="overview-content">${formatText(data.pattern||'')}</div></div>
+      <div class="card"><div class="card-title"><div class="card-title-icon">🔥</div> PYQ Insights</div><div class="overview-content">${formatText(data.pyqInsight||'')}</div></div>
+    </div>
+    <div class="grid2" style="margin-bottom:20px">
+      <div class="card"><div class="card-title"><div class="card-title-icon">⚔️</div> Winning Strategy</div><div class="overview-content">${formatText(data.strategy||'')}</div></div>
+      <div class="card"><div class="card-title"><div class="card-title-icon">📅</div> 4-Week Study Plan</div><div class="overview-content">${formatText(data.studyPlan||'')}</div></div>
+    </div>
+    <div class="card"><div class="card-title"><div class="card-title-icon">🗂️</div> Syllabus Topics <span style="font-size:13px;color:var(--text2);font-weight:400">(click to study)</span></div><div class="chips-row">${chips}</div></div>`;
+}
+
+function populateTopicFilter() {
+  const sel = document.getElementById('practiceTopicFilter');
+  sel.innerHTML = '<option value="">All Topics</option>';
+  state.topics.forEach(t => { const o=document.createElement('option'); o.value=t; o.textContent=t; sel.appendChild(o); });
+}
+
+function populateTeachGrid() {
+  const grid = document.getElementById('teachGrid');
+  if (!state.topics.length) { grid.innerHTML='<p style="color:var(--text2)">No topics found.</p>'; return; }
+  grid.innerHTML = state.topics.map((t,i) => `
+    <div class="topic-card" id="tc-${i}">
+      <div class="topic-card-header" onclick="toggleTopic(${i})">
+        <div class="topic-card-name">${t}</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="teach-btn" id="tb-${i}" onclick="event.stopPropagation();teachTopic(${i},'${t.replace(/'/g,"\\'")}')">✨ Teach Me</button>
+          <div class="chevron">▼</div>
+        </div>
+      </div>
+      <div class="topic-card-body"><div class="topic-card-content" id="tcc-${i}"><span style="color:var(--text3);font-size:13px">Click "Teach Me" to load AI explanation</span></div></div>
+    </div>`).join('');
+}
+
+function toggleTopic(i) { document.getElementById('tc-'+i).classList.toggle('open'); }
+
+async function teachTopic(i, topic) {
+  const card = document.getElementById('tc-'+i);
+  const content = document.getElementById('tcc-'+i);
+  const btn = document.getElementById('tb-'+i);
+  card.classList.add('open'); btn.disabled=true; btn.textContent='⏳ Loading…';
+  content.innerHTML='<div class="ai-loader" style="padding:20px"><div class="ai-spinner"></div></div>';
+  try {
+    const prompt = `Teach the topic "${topic}" for the ${state.exam} exam. Use these sections:
+**Core Concept** — 3-4 line explanation
+**Key Formulas / Rules** — list them
+**Exam Shortcuts & Tricks** — fast techniques
+**Solved Examples** — 2 worked examples
+**Common Mistakes** — top pitfalls
+Be concise and exam-focused.`;
+    const text = await callAI([{role:'user',content:prompt}]);
+    content.innerHTML = formatText(text);
+  } catch(e) { content.innerHTML=`<p style="color:var(--red)">Error: ${e.message}</p>`; }
+  btn.disabled=false; btn.textContent='✨ Teach Me';
+}
+
+function formatText(t) {
+  let html = t;
+  
+  // Handle headers: ## Header or **Header**
+  html = html.replace(/^#{2,3}\s+(.+)$/gm, '<h4 style="margin-top:12px;margin-bottom:8px">$1</h4>');
+  
+  // Handle bold: **text**
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--accent)">$1</strong>');
+  
+  // Handle italic: *text* (but not list bullets)
+  html = html.replace(/(?<![-*])\*([^*\n]+?)\*(?![-*])/g, '<em>$1</em>');
+  
+  // Handle inline code: `code`
+  html = html.replace(/`([^`]+)`/g, '<code style="background:var(--bg4);padding:2px 6px;border-radius:4px;font-family:monospace;font-size:12px;color:var(--accent)">$1</code>');
+  
+  // Handle unordered lists: - or * at start of line
+  html = html.replace(/^[-*]\s+(.+)$/gm, '<li style="margin-left:20px;margin-bottom:6px;list-style:disc inside">$1</li>');
+  
+  // Wrap consecutive li tags in ul
+  html = html.replace(/(<li[^>]*>[^<]*<\/li>\n?)+/g, function(match) {
+    return '<ul style="margin:8px 0;padding:0">' + match.trimEnd() + '</ul>';
+  });
+  
+  // Handle paragraph breaks
+  html = html.replace(/\n\n+/g, '</p><p style="margin-bottom:12px">');
+  
+  // Wrap content in paragraph tags if not already
+  if (!html.startsWith('<h') && !html.startsWith('<ul') && !html.startsWith('<p')) {
+    html = '<p style="margin-bottom:12px">' + html + '</p>';
+  }
+  
+  // Clean line breaks
+  html = html.replace(/\n/g, '<br>');
+  
+  return html;
+}
+
+async function quickTeach(topic) {
+  switchTab('teach', document.querySelectorAll('.tab-btn')[2]);
+  const idx = state.topics.indexOf(topic);
+  if (idx >= 0) { setTimeout(() => teachTopic(idx, topic), 100); document.getElementById('tc-'+idx)?.scrollIntoView({behavior:'smooth',block:'center'}); }
+}
+
+// ── PRACTICE ──
+let questions = [];
+async function generateQuestions() {
+  const topic = document.getElementById('practiceTopicFilter').value;
+  const diff = document.getElementById('practiceDiffFilter').value;
+  const count = document.getElementById('practiceCountFilter').value;
+  const btn = document.getElementById('genBtn');
+  btn.disabled=true; document.getElementById('genBtnIcon').textContent='⏳';
+  document.getElementById('questionsContainer').innerHTML='<div class="ai-loader"><div class="ai-spinner"></div><span>Generating questions…</span></div>';
+  try {
+    const topicStr = topic || 'mixed relevant topics';
+    const prompt = `Generate ${count} exam questions as a JSON array ONLY. No other text.
+
+[
+  {
+    "q": "Question?",
+    "options": ["A) Answer1", "B) Answer2", "C) Answer3", "D) Answer4"],
+    "correct": 0,
+    "explanation": "Why A is correct",
+    "trick": "Quick method"
+  }
+]
+
+Exam: TCS NQT
+Topic: ${topicStr}
+Difficulty: ${diff}
+
+Return ONLY the JSON array.`;
+    
+    const raw = await callAI(
+      [{role:'user',content:prompt}],
+      `You are a question generator. Return only JSON that matches the requested schema.`,
+      {
+        temperature: 0.2,
+        responseMimeType: 'application/json',
+        responseSchema: {
+          type: 'ARRAY',
+          items: {
+            type: 'OBJECT',
+            required: ['q', 'options', 'correct'],
+            properties: {
+              q: { type: 'STRING' },
+              options: {
+                type: 'ARRAY',
+                items: { type: 'STRING' }
+              },
+              correct: { type: 'NUMBER' },
+              explanation: { type: 'STRING' },
+              trick: { type: 'STRING' }
+            }
+          }
+        }
+      }
+    );
+    let parsed = parseQuestionsJSON(raw);
+    
+    if (!Array.isArray(parsed)) parsed = [parsed];
+    if (parsed.length === 0) throw new Error('No questions generated');
+    
+    // Normalize and validate questions
+    let validQuestions = [];
+    for (let i = 0; i < parsed.length; i++) {
+      let q = parsed[i];
+      try {
+        // Normalize question
+        if (!q.q || typeof q.q !== 'string') throw new Error(`Q${i}: Missing question text`);
+        if (!Array.isArray(q.options) || q.options.length < 2) throw new Error(`Q${i}: Need 2+ options`);
+        if (q.correct === undefined || q.correct === null) throw new Error(`Q${i}: No correct answer`);
+        
+        // Convert correct to number if string
+        if (typeof q.correct === 'string') {
+          const parsedCorrect = parseInt(q.correct, 10);
+          q.correct = Number.isNaN(parsedCorrect) ? 0 : parsedCorrect;
+        }
+        
+        // Ensure options are strings
+        q.options = q.options.map(o => String(o).trim());
+        q.explanation = String(q.explanation || '');
+        q.trick = String(q.trick || '');
+        
+        // Validate correct index is in range
+        if (q.correct < 0 || q.correct >= q.options.length) {
+          q.correct = 0;  // Default to first if out of range
+        }
+        
+        validQuestions.push(q);
+      } catch(err) {
+        console.warn('Skipping question:', err.message);
+      }
+    }
+    
+    if (validQuestions.length === 0) throw new Error('No valid questions could be generated');
+    
+    questions = validQuestions;
+    renderQuestions(validQuestions, topic||topicStr, diff);
+  } catch(e) {
+    document.getElementById('questionsContainer').innerHTML=`<div class="card"><p style="color:var(--red)">❌ ${e.message}</p></div>`;
+  }
+  btn.disabled=false; document.getElementById('genBtnIcon').textContent='⚡';
+}
+
+function parseQuestionsJSON(raw) {
+  const clean = extractJSONPayload(raw);
+  const candidates = buildQuestionParseCandidates(clean);
+
+  for (const candidate of candidates) {
+    try {
+      const parsed = unwrapQuestionArray(JSON.parse(candidate));
+      if (!Array.isArray(parsed)) throw new Error('Not an array');
+      return parsed;
+    } catch (e) {
+      // Try the next conservative recovery strategy.
+    }
+  }
+
+  try {
+    unwrapQuestionArray(JSON.parse(clean));
+  } catch (e) {
+    throw new Error(`JSON Parse: ${e.message}`);
+  }
+
+  throw new Error('JSON Parse: Response is not a JSON array');
+}
+
+function extractJSONPayload(raw) {
+  let clean = String(raw || '').trim();
+  clean = clean.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+  const arrayStart = clean.indexOf('[');
+  const arrayEnd = clean.lastIndexOf(']');
+  const objectStart = clean.indexOf('{');
+  const objectEnd = clean.lastIndexOf('}');
+
+  if (arrayStart !== -1 && arrayEnd > arrayStart) {
+    return clean.substring(arrayStart, arrayEnd + 1).trim();
+  }
+
+  if (objectStart !== -1 && objectEnd > objectStart) {
+    return clean.substring(objectStart, objectEnd + 1).trim();
+  }
+
+  throw new Error('Response is not JSON');
+}
+
+function buildQuestionParseCandidates(json) {
+  const candidates = [];
+  const seen = new Set();
+
+  function add(value) {
+    const normalized = value.trim();
+    if (!normalized || seen.has(normalized)) return;
+    seen.add(normalized);
+    candidates.push(normalized);
+  }
+
+  add(json);
+
+  const escaped = escapeNewlinesInsideStrings(json);
+  add(escaped);
+  add(repairBrokenQuestionJSON(json));
+  add(repairBrokenQuestionJSON(escaped));
+
+  // Safe cleanup: trailing commas are invalid JSON and easy to recover from.
+  add(json.replace(/,\s*([\]}])/g, '$1'));
+  add(escaped.replace(/,\s*([\]}])/g, '$1'));
+  add(repairBrokenQuestionJSON(json).replace(/,\s*([\]}])/g, '$1'));
+  add(repairBrokenQuestionJSON(escaped).replace(/,\s*([\]}])/g, '$1'));
+
+  return candidates;
+}
+
+function unwrapQuestionArray(parsed) {
+  if (Array.isArray(parsed)) return parsed;
+  if (parsed && Array.isArray(parsed.questions)) return parsed.questions;
+  if (parsed && Array.isArray(parsed.items)) return parsed.items;
+  if (parsed && Array.isArray(parsed.data)) return parsed.data;
+  throw new Error('Response is not a JSON array');
+}
+
+function escapeNewlinesInsideStrings(text) {
+  let result = '';
+  let inString = false;
+  let escaped = false;
+
+  for (const ch of text) {
+    if (inString) {
+      if (escaped) {
+        result += ch;
+        escaped = false;
+        continue;
+      }
+
+      if (ch === '\\') {
+        result += ch;
+        escaped = true;
+        continue;
+      }
+
+      if (ch === '"') {
+        inString = false;
+        result += ch;
+        continue;
+      }
+
+      if (ch === '\n') {
+        result += '\\n';
+        continue;
+      }
+
+      if (ch === '\r') {
+        result += '\\r';
+        continue;
+      }
+
+      result += ch;
+      continue;
+    }
+
+    if (ch === '"') inString = true;
+    result += ch;
+  }
+
+  return result;
+}
+
+function repairBrokenQuestionJSON(text) {
+  let fixed = String(text || '').trim();
+
+  // Insert commas between object properties when the model omits them.
+  fixed = fixed.replace(/(["\]}\d])(\s*\n\s*)"([A-Za-z_][^"]*?)"\s*:/g, '$1,$2"$3":');
+
+  // Insert commas between adjacent objects in arrays.
+  fixed = fixed.replace(/}\s*\n\s*{/g, '},\n{');
+
+  // Insert commas between array/object values and the next key on the same line.
+  fixed = fixed.replace(/(\]|\}|"(?:[^"\\]|\\.)*"|-?\d+(?:\.\d+)?|true|false|null)(\s+)"([A-Za-z_][^"]*?)"\s*:/g, '$1,$2"$3":');
+
+  return fixed;
+}
+
+
+function renderQuestions(qs, topic, diff) {
+  if (!qs?.length) { document.getElementById('questionsContainer').innerHTML='<div class="card"><p style="color:var(--text2)">No questions. Try again.</p></div>'; return; }
+  document.getElementById('questionsContainer').innerHTML = qs.map((q,qi) => {
+    const dc = diff.toLowerCase();
+    return `<div class="question-card" id="qc-${qi}">
+      <div class="q-header"><div style="font-size:13px;color:var(--text2)">Q${qi+1} · ${topic}</div><span class="q-badge ${dc}">${dc}</span></div>
+      <div class="q-text">${q.q}</div>
+      <div class="q-options" id="opts-${qi}">
+        ${q.options.map((o,oi)=>`<div class="q-option" id="opt-${qi}-${oi}" onclick="answerQ(${qi},${oi},${q.correct})"><div class="opt-letter">${['A','B','C','D'][oi]}</div><div>${o.replace(/^[A-D]\)\s*/,'')}</div></div>`).join('')}
+      </div>
+      <div class="q-explanation" id="exp-${qi}">
+        <div class="exp-label">💡 Explanation</div>
+        <div class="exp-text">${q.explanation||''}</div>
+        ${q.trick?`<div class="trick-box"><div class="trick-label">⚡ Shortcut Trick</div><div style="font-size:13px;color:var(--text2);margin-top:4px">${q.trick}</div></div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function answerQ(qi, selected, correct) {
+  const opts = document.getElementById('opts-'+qi);
+  if (opts.querySelector('.disabled')) return;
+  opts.querySelectorAll('.q-option').forEach((o,i) => { o.classList.add('disabled'); if(i===correct)o.classList.add('correct'); else if(i===selected)o.classList.add('wrong'); });
+  document.getElementById('exp-'+qi).classList.add('show');
+  updateProgress(selected===correct, document.getElementById('practiceTopicFilter').value||'General');
+}
+
+// ── CHAT ──
+function initChat() {
+  document.getElementById('chatMessages').innerHTML = '';
+  state.chatHistory = [];
+  addMsg('ai', `Hey! I'm your dedicated **${state.exam}** AI tutor 🎯\n\nI know this exam inside out — patterns, PYQs, strategies, formulas and shortcuts. What would you like to explore?`);
+  const sug = [`Most important topics in ${state.exam}?`, `How to prepare in 30 days?`, `What is the cut-off trend?`, `PYQ pattern breakdown`];
+  document.getElementById('chatSuggestions').innerHTML = sug.map(s=>`<div class="suggest-chip" onclick="sendSuggestion('${s.replace(/'/g,"\\'")}')"> ${s}</div>`).join('');
+}
+
+function addMsg(role, text) {
+  const msgs = document.getElementById('chatMessages');
+  const div = document.createElement('div'); div.className='msg '+role;
+  const fmt = text.replace(/\n/g,'<br>').replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  div.innerHTML = `<div class="msg-avatar">${role==='ai'?'A':'👤'}</div><div class="msg-bubble">${fmt}</div>`;
+  msgs.appendChild(div); msgs.scrollTop=msgs.scrollHeight;
+}
+
+async function sendSuggestion(text) {
+  document.getElementById('chatInput').value = text;
+  await sendMessage();
+}
+
+async function sendMessage() {
+  const txt = document.getElementById('chatInput').value.trim();
+  if (!txt) return;
+  document.getElementById('chatInput').value = '';
+  addMsg('user', txt);
+  try {
+    const resp = await callAI([...state.chatHistory, {role:'user',content:txt}]);
+    state.chatHistory.push({role:'user',content:txt}, {role:'assistant',content:resp});
+    addMsg('ai', resp);
+  } catch(e) {
+    addMsg('ai', `❌ Error: ${e.message}`);
+  }
+}
+
+// Initialize on page load
+window.addEventListener('DOMContentLoaded', () => {
+  try {
+    selectModel('gemini');
+    const saved = localStorage.getItem('prepmind_key_gemini') || '';
+    if (saved) {
+      const inp = document.getElementById('apiKeyInput');
+      if (inp) inp.value = saved;
+      const btn = document.getElementById('keySaveBtn');
+      if (btn) {
+        btn.textContent = '✓ Saved';
+        btn.classList.add('key-saved');
+      }
+    }
+  } catch(e) {
+    console.error('Init error:', e);
+  }
+});
+
+function showTyping() {
+  const msgs=document.getElementById('chatMessages'); 
+  const div=document.createElement('div');
+  div.className='msg ai'; 
+  div.id='typingIndicator';
+  div.innerHTML=`<div class="msg-avatar">A</div><div class="msg-bubble"><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div></div>`;
+  msgs.appendChild(div); 
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+function removeTyping() { 
+  const typing = document.getElementById('typingIndicator');
+  if (typing) typing.remove(); 
+}
+
+async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim(); 
+  if (!text) return;
+  input.value=''; 
+  input.style.height='auto';
+  document.getElementById('chatSuggestions').innerHTML='';
+  addMsg('user', text); 
+  state.chatHistory.push({role:'user',content:text});
+  document.getElementById('sendBtn').disabled=true; 
+  showTyping();
+  try {
+    const sys = `You are an expert AI tutor for ${state.exam}. Help the student prepare. Be accurate, concise and practical.`;
+    const reply = await callAI(state.chatHistory.slice(-10), sys);
+    removeTyping(); 
+    addMsg('ai', reply);
+    state.chatHistory.push({role:'assistant',content:reply});
+  } catch(e) { 
+    removeTyping(); 
+    addMsg('ai', 'Sorry, error: ' + e.message); 
+  }
+  document.getElementById('sendBtn').disabled=false;
+}
+
+function sendSuggestion(text) { 
+  const inp = document.getElementById('chatInput');
+  if (inp) {
+    inp.value = text; 
+    sendChat(); 
+  }
+}
+
+function chatKeyDown(e) {
+  if (e.key==='Enter'&&!e.shiftKey) { 
+    e.preventDefault(); 
+    sendChat(); 
+  }
+  const ta=e.target; 
+  ta.style.height='auto'; 
+  ta.style.height=Math.min(ta.scrollHeight,120)+'px';
+}
+
+function updateProgress(correct, topic) {
+  state.progress.total++; 
+  if(correct) state.progress.correct++;
+  if(!state.progress.topics[topic]) state.progress.topics[topic]={total:0,correct:0};
+  state.progress.topics[topic].total++; 
+  if(correct) state.progress.topics[topic].correct++;
+  const badge = document.getElementById('progressBadge');
+  if (badge) badge.textContent = state.progress.total;
+}
+
+function renderProgress() {
+  const {total,correct,topics}=state.progress; 
+  const acc=total?Math.round(correct/total*100):0;
+  const stats = document.getElementById('progressStats');
+  if (stats) {
+    stats.innerHTML=`
+      <div class="prog-stat"><div class="prog-stat-num">${total}</div><div class="prog-stat-label">Attempted</div></div>
+      <div class="prog-stat"><div class="prog-stat-num">${correct}</div><div class="prog-stat-label">Correct</div></div>
+      <div class="prog-stat"><div class="prog-stat-num">${acc}%</div><div class="prog-stat-label">Accuracy</div></div>
+      <div class="prog-stat"><div class="prog-stat-num">${total-correct}</div><div class="prog-stat-label">Incorrect</div></div>`;
+  }
+  const topicAcc = document.getElementById('topicAccuracy');
+  if (topicAcc) {
+    topicAcc.innerHTML = Object.entries(topics).length
+      ? Object.entries(topics).map(([t,s])=>{const a=Math.round(s.correct/s.total*100);return `<div class="topic-row"><div class="topic-row-name">${t}</div><div class="topic-row-bar"><div class="prog-bar-wrap"><div class="prog-bar-fill ${a>=70?'green':a<40?'red':''}" style="width:${a}%"></div></div></div><div class="topic-row-stats">${s.correct}/${s.total} · ${a}%</div></div>`;}).join('')
+      : '<p style="color:var(--text2);font-size:14px;text-align:center;padding:20px 0">Practice to see topic stats</p>';
+  }
+}
+</script>
+</body>
+</html>
